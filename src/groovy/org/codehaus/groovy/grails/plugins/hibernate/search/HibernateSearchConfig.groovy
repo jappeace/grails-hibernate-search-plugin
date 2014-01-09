@@ -1,14 +1,15 @@
 package org.codehaus.groovy.grails.plugins.hibernate.search
 
-import org.apache.commons.logging.LogFactory
 import org.hibernate.Session
 import org.hibernate.search.FullTextSession
 import org.hibernate.search.MassIndexer
 import org.hibernate.search.Search
+import org.apache.commons.logging.LogFactory
 
-class HibernateSearchConfig {
+class HibernateSearchConfig extends AbstractHibernateSearch{
 
-	private final static log = LogFactory.getLog this
+
+	protected final static log = LogFactory.getLog this
 
 	private MassIndexer massIndexer
 	private final FullTextSession fullTextSession
@@ -52,23 +53,13 @@ class HibernateSearchConfig {
 		}
 		massIndexer = fullTextSession.createIndexer().startAndWait()
 	}
-
+	/** makes it possible to ignore not concerned config */
 	Object invokeMethod( String name, Object args ) {
 		if ( name in MASS_INDEXER_METHODS ) {
 			massIndexer = massIndexer.invokeMethod name, args
+		}else{
+			log.info "ignoring config: " + name
 		}
 
-		// makes it possible to ignore not concerned config
 	}
-
-	def invokeClosureNode( Closure callable ) {
-		if ( !callable ){
-			return
-		}
-
-		callable.delegate = this
-		callable.resolveStrategy = Closure.DELEGATE_FIRST
-		callable()
-	}
-
 }

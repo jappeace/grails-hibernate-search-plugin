@@ -26,7 +26,7 @@ import org.hibernate.search.Search
 import org.hibernate.search.query.dsl.QueryBuilder
 import org.codehaus.groovy.grails.plugins.hibernate.search.components.*
 
-class HibernateSearchQueryBuilder {
+class HibernateSearchQueryBuilder extends AbstractHibernateSearch {
 
 	private static final def SORT_TYPES = [( Integer ): SortField.INT,
 			( Double ): SortField.DOUBLE,
@@ -108,22 +108,6 @@ class HibernateSearchQueryBuilder {
 		currentNode = root
 	}
 
-	Object invokeMethod( String name, Object args ) {
-		if ( name in MASS_INDEXER_METHODS ) {
-			massIndexer = massIndexer.invokeMethod name, args
-		} else {
-			throw new MissingMethodException( name, getClass(), args )
-		}
-	}
-
-	def invokeClosureNode( Closure callable ) {
-		if ( !callable )
-			return
-
-		callable.delegate = this
-		callable.resolveStrategy = Closure.DELEGATE_FIRST
-		callable.call()
-	}
 	/**
 	 *
 	 * @param searchDsl
