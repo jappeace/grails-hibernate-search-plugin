@@ -2,6 +2,7 @@ import org.codehaus.groovy.grails.commons.ClassPropertyFetcher
 import org.codehaus.groovy.grails.plugins.hibernate.search.HibernateSearchConfig
 import org.codehaus.groovy.grails.plugins.hibernate.search.HibernateSearchQueryBuilder
 import org.codehaus.groovy.grails.plugins.hibernate.search.SearchMappingConfigurableLocalSessionFactoryBean
+import org.codehaus.groovy.grails.plugins.hibernate.search.reflection.DomainInspector
 import org.hibernate.*
 import org.hibernate.search.annotations.Indexed
 import org.hibernate.search.Search
@@ -38,24 +39,16 @@ class HibernateSearchGrailsPlugin {
 				ctx.sessionFactory.currentSession
 		) 
 
-		// add methods to the domain
-		application.domainClasses.each { grailsClass ->
+		new DomainInspector(app: application).withIndexedDomainClasses{
 			def clazz = grailsClass.clazz
-
-			if (
-				ClassPropertyFetcher.forClass( clazz ).getStaticPropertyValue( "search", Closure ) ||
-				AnnotationUtils.isAnnotationDeclaredLocally( Indexed, clazz )
-			) {
-									
-				// add search() method to indexed domain classes:
-				grailsClass.metaClass.static.search = {
-					new HibernateSearchQueryBuilder(clazz, hiberTextSes)
-				}
-				
-				// add search() method to indexed domain instances:
-				grailsClass.metaClass.search = {
-					new HibernateSearchQueryBuilder(clazz, delegate, hiberTextSes)
-				}
+			// add search() method to indexed domain classes:
+			grailsClass.metaClass.static.search = { Grailsclass ->
+				new HibernateSearchQueryBuilder(clazz, hiberTextSes)
+			}
+			
+			// add search() method to indexed domain instances:
+			grailsClass.metaClass.search = {
+				new HibernateSearchQueryBuilder(clazz, delegate, hiberTextSes)
 			}
 		}
 
