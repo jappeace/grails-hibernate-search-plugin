@@ -1,12 +1,9 @@
-import org.codehaus.groovy.grails.commons.ClassPropertyFetcher
 import org.codehaus.groovy.grails.plugins.hibernate.search.HibernateSearchConfig
 import org.codehaus.groovy.grails.plugins.hibernate.search.HibernateSearchQueryBuilder
 import org.codehaus.groovy.grails.plugins.hibernate.search.SearchMappingConfigurableLocalSessionFactoryBean
 import org.codehaus.groovy.grails.plugins.hibernate.search.reflection.DomainInspector
 import org.hibernate.*
-import org.hibernate.search.annotations.Indexed
 import org.hibernate.search.Search
-import org.springframework.core.annotation.AnnotationUtils
 
 class HibernateSearchGrailsPlugin {
 	def version = "0.81"
@@ -39,10 +36,10 @@ class HibernateSearchGrailsPlugin {
 				ctx.sessionFactory.currentSession
 		) 
 
-		new DomainInspector(app: application).withIndexedDomainClasses{
+		new DomainInspector(app: application).withIndexedDomainClasses{ grailsClass ->
 			def clazz = grailsClass.clazz
 			// add search() method to indexed domain classes:
-			grailsClass.metaClass.static.search = { Grailsclass ->
+			grailsClass.metaClass.static.search = { 
 				new HibernateSearchQueryBuilder(clazz, hiberTextSes)
 			}
 			
