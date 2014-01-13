@@ -48,7 +48,6 @@ class HibernateSearchGrailsPlugin {
 				new HibernateSearchQueryBuilder(clazz, delegate, hiberTextSes)
 			}
 		}
-
 		// load config and execute
 		new HibernateSearchConfig(hiberTextSes).invokeClosureNode(
 			application.config.grails.plugins.hibernatesearch
