@@ -54,4 +54,17 @@ class HibernateSearchGrailsPlugin {
 		)
 
 	}
+
+	def onShutdown = { event ->
+		/** delete all indexes on shutdown. This solves a lot of syncing problems between the indexies and the app.
+		* Since the database does not have to be shutdown when the app is. The massindexer should be used to get the
+		* database up to date.
+		*
+		* It might be a good Idea to create a configuration for this, but I don't need that...
+		*/
+		new DomainInspector(app: application).withIndexedDomainClasses{ grailsClass ->
+			def clazz = grailsClass.clazz
+			clazz.search().purgeAll()
+		}
+	}
 }
